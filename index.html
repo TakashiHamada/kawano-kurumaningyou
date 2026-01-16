@@ -174,9 +174,56 @@
         .reload-button:active {
             transform: rotate(180deg) scale(0.95);
         }
+
+        .orientation-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .orientation-warning-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: rotate-phone 2s ease-in-out infinite;
+        }
+
+        .orientation-warning-text {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        @keyframes rotate-phone {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+        }
+
+        @media screen and (orientation: landscape) and (max-height: 500px) {
+            .orientation-warning {
+                display: flex;
+            }
+            .player-container {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="orientation-warning">
+        <div class="orientation-warning-icon">📱</div>
+        <div class="orientation-warning-text">画面を縦向きにしてください</div>
+    </div>
+
     <div class="player-container">
         <button class="reload-button" id="reloadBtn" title="ページをリロード">🔄</button>
 
