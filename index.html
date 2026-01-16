@@ -111,11 +111,53 @@
             display: inline-block;
             width: 100px;
         }
+
+        .audio-selector {
+            margin-bottom: 20px;
+        }
+
+        .audio-selector label {
+            display: block;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .audio-selector select {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .audio-selector select:hover {
+            border-color: #764ba2;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .audio-selector select:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
     </style>
 </head>
 <body>
     <div class="player-container">
         <h1>🎵 音声プレイヤー</h1>
+
+        <div class="audio-selector">
+            <label for="audioSelect">音声を選択:</label>
+            <select id="audioSelect">
+                <option value="">読み込み中...</option>
+            </select>
+        </div>
 
         <div class="audio-info" id="audioInfo">
             <h2 id="audioTitle">音声情報</h2>
@@ -152,8 +194,10 @@
         const audioTitle = document.getElementById('audioTitle');
         const speaker = document.getElementById('speaker');
         const recordedDate = document.getElementById('recordedDate');
+        const audioSelect = document.getElementById('audioSelect');
 
         let audioMetadata = {};
+        let audioFiles = [];
 
         // CSVファイルを読み込んで音声メタデータを取得
         async function loadAudioMetadata() {
@@ -164,18 +208,39 @@
 
                 // ヘッダー行をスキップして、データを解析
                 for (let i = 1; i < lines.length; i++) {
-                    const [filename, title, speakerName, date] = lines[i].split(',');
-                    audioMetadata[filename] = {
-                        title: title,
-                        speaker: speakerName,
-                        recordedDate: date
-                    };
+                    const line = lines[i].trim();
+                    if (line) {
+                        const [filename, title, speakerName, date] = line.split(',');
+                        audioMetadata[filename] = {
+                            title: title,
+                            speaker: speakerName,
+                            recordedDate: date
+                        };
+                        audioFiles.push(filename);
+                    }
                 }
 
-                // 現在の音声ファイルの情報を表示
-                updateAudioInfo();
+                // セレクトボックスのオプションを生成
+                populateAudioSelector();
             } catch (error) {
                 console.error('メタデータの読み込みに失敗しました:', error);
+            }
+        }
+
+        // セレクトボックスにオプションを追加
+        function populateAudioSelector() {
+            audioSelect.innerHTML = '';
+            audioFiles.forEach((filename) => {
+                const option = document.createElement('option');
+                option.value = filename;
+                option.textContent = audioMetadata[filename].title;
+                audioSelect.appendChild(option);
+            });
+
+            // 最初のファイルを選択状態にして読み込む
+            if (audioFiles.length > 0) {
+                audioSelect.value = audioFiles[0];
+                changeAudio(audioFiles[0]);
             }
         }
 
@@ -195,6 +260,27 @@
                 recordedDate.textContent = '-';
             }
         }
+
+        // 音声ファイルを切り替える
+        function changeAudio(filename) {
+            const wasPlaying = !audio.paused;
+            const currentTime = audio.currentTime;
+
+            // 音声ソースを変更
+            audio.querySelector('source').src = filename;
+            audio.load();
+
+            // メタデータを更新
+            updateAudioInfo();
+
+            // 再生状態をリセット
+            status.textContent = '';
+        }
+
+        // セレクトボックス変更時のイベント
+        audioSelect.addEventListener('change', (e) => {
+            changeAudio(e.target.value);
+        });
 
         // ページ読み込み時にメタデータを取得
         window.addEventListener('DOMContentLoaded', loadAudioMetadata);
