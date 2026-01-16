@@ -207,8 +207,8 @@
         </div>
 
         <div class="button-container">
-            <button class="play-button" id="playBtn">▶ 再生</button>
-            <button class="play-button" id="pauseBtn">⏸ 一時停止</button>
+            <button class="play-button" id="playPauseBtn">▶ 再生</button>
+            <button class="play-button" id="rewindBtn">⏪ 5秒戻す</button>
         </div>
 
         <div class="status" id="status"></div>
@@ -216,8 +216,8 @@
 
     <script>
         const audio = document.getElementById('audioPlayer');
-        const playBtn = document.getElementById('playBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const rewindBtn = document.getElementById('rewindBtn');
         const status = document.getElementById('status');
         const audioTitle = document.getElementById('audioTitle');
         const speaker = document.getElementById('speaker');
@@ -303,6 +303,7 @@
 
             // 再生状態をリセット
             status.textContent = '';
+            updatePlayPauseButton();
         }
 
         // セレクトボックス変更時のイベント
@@ -319,32 +320,47 @@
             location.reload();
         });
 
-        // 再生ボタン
-        playBtn.addEventListener('click', () => {
-            audio.play();
-            status.textContent = '再生中...';
+        // 再生/一時停止ボタンのテキストを更新
+        function updatePlayPauseButton() {
+            if (audio.paused) {
+                playPauseBtn.textContent = '▶ 再生';
+            } else {
+                playPauseBtn.textContent = '⏸ 一時停止';
+            }
+        }
+
+        // 再生/一時停止ボタン
+        playPauseBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
         });
 
-        // 一時停止ボタン
-        pauseBtn.addEventListener('click', () => {
-            audio.pause();
-            status.textContent = '一時停止中';
+        // 5秒巻き戻しボタン
+        rewindBtn.addEventListener('click', () => {
+            audio.currentTime = Math.max(0, audio.currentTime - 5);
+            status.textContent = '5秒巻き戻しました';
         });
 
         // 再生終了時
         audio.addEventListener('ended', () => {
             status.textContent = '再生が完了しました';
+            updatePlayPauseButton();
         });
 
         // 再生中の状態更新
         audio.addEventListener('play', () => {
             status.textContent = '再生中...';
+            updatePlayPauseButton();
         });
 
         audio.addEventListener('pause', () => {
             if (audio.currentTime < audio.duration) {
                 status.textContent = '一時停止中';
             }
+            updatePlayPauseButton();
         });
     </script>
 </body>
