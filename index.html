@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音声プレイヤー</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .player-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .audio-player {
+            margin: 20px 0;
+        }
+
+        .play-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin: 10px;
+        }
+
+        .play-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .play-button:active {
+            transform: translateY(0);
+        }
+
+        .play-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 20px;
+            outline: none;
+        }
+
+        .status {
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="player-container">
+        <h1>🎵 音声プレイヤー</h1>
+
+        <div class="audio-player">
+            <audio id="audioPlayer" controls>
+                <source src="kowakara_furuya.mp3" type="audio/mpeg">
+                お使いのブラウザは音声再生に対応していません。
+            </audio>
+        </div>
+
+        <button class="play-button" id="playBtn">▶ 再生</button>
+        <button class="play-button" id="pauseBtn">⏸ 一時停止</button>
+        <button class="play-button" id="stopBtn">⏹ 停止</button>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const status = document.getElementById('status');
+
+        // 再生ボタン
+        playBtn.addEventListener('click', () => {
+            audio.play();
+            status.textContent = '再生中...';
+        });
+
+        // 一時停止ボタン
+        pauseBtn.addEventListener('click', () => {
+            audio.pause();
+            status.textContent = '一時停止中';
+        });
+
+        // 停止ボタン
+        stopBtn.addEventListener('click', () => {
+            audio.pause();
+            audio.currentTime = 0;
+            status.textContent = '停止しました';
+        });
+
+        // 再生終了時
+        audio.addEventListener('ended', () => {
+            status.textContent = '再生が完了しました';
+        });
+
+        // 再生中の状態更新
+        audio.addEventListener('play', () => {
+            status.textContent = '再生中...';
+        });
+
+        audio.addEventListener('pause', () => {
+            if (audio.currentTime === 0) {
+                status.textContent = '停止しました';
+            } else if (audio.currentTime < audio.duration) {
+                status.textContent = '一時停止中';
+            }
+        });
+    </script>
+</body>
+</html>
