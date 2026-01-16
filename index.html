@@ -35,6 +35,13 @@
             margin: 20px 0;
         }
 
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
         .play-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -45,7 +52,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            margin: 10px;
+            flex: 1;
+            max-width: 150px;
         }
 
         .play-button:hover {
@@ -128,9 +136,10 @@
             </audio>
         </div>
 
-        <button class="play-button" id="playBtn">▶ 再生</button>
-        <button class="play-button" id="pauseBtn">⏸ 一時停止</button>
-        <button class="play-button" id="stopBtn">⏹ 停止</button>
+        <div class="button-container">
+            <button class="play-button" id="playBtn">▶ 再生</button>
+            <button class="play-button" id="pauseBtn">⏸ 一時停止</button>
+        </div>
 
         <div class="status" id="status"></div>
     </div>
@@ -139,7 +148,6 @@
         const audio = document.getElementById('audioPlayer');
         const playBtn = document.getElementById('playBtn');
         const pauseBtn = document.getElementById('pauseBtn');
-        const stopBtn = document.getElementById('stopBtn');
         const status = document.getElementById('status');
         const audioTitle = document.getElementById('audioTitle');
         const speaker = document.getElementById('speaker');
@@ -203,13 +211,6 @@
             status.textContent = '一時停止中';
         });
 
-        // 停止ボタン
-        stopBtn.addEventListener('click', () => {
-            audio.pause();
-            audio.currentTime = 0;
-            status.textContent = '停止しました';
-        });
-
         // 再生終了時
         audio.addEventListener('ended', () => {
             status.textContent = '再生が完了しました';
@@ -221,9 +222,7 @@
         });
 
         audio.addEventListener('pause', () => {
-            if (audio.currentTime === 0) {
-                status.textContent = '停止しました';
-            } else if (audio.currentTime < audio.duration) {
+            if (audio.currentTime < audio.duration) {
                 status.textContent = '一時停止中';
             }
         });
