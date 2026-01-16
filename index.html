@@ -338,9 +338,6 @@
 
         // 音声ファイルを切り替える
         function changeAudio(filename) {
-            const wasPlaying = !audio.paused;
-            const currentTime = audio.currentTime;
-
             // 音声ソースを変更
             audio.querySelector('source').src = filename;
             audio.load();
