@@ -23,6 +23,7 @@
             text-align: center;
             max-width: 400px;
             width: 90%;
+            position: relative;
         }
 
         h1 {
@@ -146,10 +147,40 @@
             border-color: #764ba2;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
         }
+
+        .reload-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .reload-button:hover {
+            transform: rotate(180deg) scale(1.1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.6);
+        }
+
+        .reload-button:active {
+            transform: rotate(180deg) scale(0.95);
+        }
     </style>
 </head>
 <body>
     <div class="player-container">
+        <button class="reload-button" id="reloadBtn" title="ページをリロード">🔄</button>
+
         <h1>🎵 音声プレイヤー</h1>
 
         <div class="audio-selector">
@@ -284,6 +315,12 @@
 
         // ページ読み込み時にメタデータを取得
         window.addEventListener('DOMContentLoaded', loadAudioMetadata);
+
+        // リロードボタン
+        const reloadBtn = document.getElementById('reloadBtn');
+        reloadBtn.addEventListener('click', () => {
+            location.reload();
+        });
 
         // 再生ボタン
         playBtn.addEventListener('click', () => {
