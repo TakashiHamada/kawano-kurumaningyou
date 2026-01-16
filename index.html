@@ -74,11 +74,52 @@
             font-size: 14px;
             min-height: 20px;
         }
+
+        .audio-info {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .audio-info h2 {
+            color: #333;
+            font-size: 20px;
+            margin: 0 0 15px 0;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .info-item {
+            margin: 10px 0;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #667eea;
+            display: inline-block;
+            width: 100px;
+        }
     </style>
 </head>
 <body>
     <div class="player-container">
         <h1>🎵 音声プレイヤー</h1>
+
+        <div class="audio-info" id="audioInfo">
+            <h2 id="audioTitle">音声情報</h2>
+            <div class="info-item">
+                <span class="info-label">話者:</span>
+                <span id="speaker">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">収録年月日:</span>
+                <span id="recordedDate">-</span>
+            </div>
+        </div>
 
         <div class="audio-player">
             <audio id="audioPlayer" controls>
@@ -100,6 +141,55 @@
         const pauseBtn = document.getElementById('pauseBtn');
         const stopBtn = document.getElementById('stopBtn');
         const status = document.getElementById('status');
+        const audioTitle = document.getElementById('audioTitle');
+        const speaker = document.getElementById('speaker');
+        const recordedDate = document.getElementById('recordedDate');
+
+        let audioMetadata = {};
+
+        // CSVファイルを読み込んで音声メタデータを取得
+        async function loadAudioMetadata() {
+            try {
+                const response = await fetch('audio_metadata.csv');
+                const csvText = await response.text();
+                const lines = csvText.trim().split('\n');
+
+                // ヘッダー行をスキップして、データを解析
+                for (let i = 1; i < lines.length; i++) {
+                    const [filename, title, speakerName, date] = lines[i].split(',');
+                    audioMetadata[filename] = {
+                        title: title,
+                        speaker: speakerName,
+                        recordedDate: date
+                    };
+                }
+
+                // 現在の音声ファイルの情報を表示
+                updateAudioInfo();
+            } catch (error) {
+                console.error('メタデータの読み込みに失敗しました:', error);
+            }
+        }
+
+        // 音声情報を更新
+        function updateAudioInfo() {
+            const currentSource = audio.querySelector('source').src;
+            const filename = currentSource.split('/').pop();
+
+            if (audioMetadata[filename]) {
+                const metadata = audioMetadata[filename];
+                audioTitle.textContent = metadata.title;
+                speaker.textContent = metadata.speaker;
+                recordedDate.textContent = metadata.recordedDate;
+            } else {
+                audioTitle.textContent = '音声情報';
+                speaker.textContent = '-';
+                recordedDate.textContent = '-';
+            }
+        }
+
+        // ページ読み込み時にメタデータを取得
+        window.addEventListener('DOMContentLoaded', loadAudioMetadata);
 
         // 再生ボタン
         playBtn.addEventListener('click', () => {
