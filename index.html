@@ -274,6 +274,19 @@
         let audioMetadata = {};
         let audioFiles = [];
 
+        // クッキーに選択音源を保存
+        function saveSelectedAudio(filename) {
+            const expires = new Date();
+            expires.setFullYear(expires.getFullYear() + 1);
+            document.cookie = 'selectedAudio=' + encodeURIComponent(filename) + '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax';
+        }
+
+        // クッキーから選択音源を取得
+        function getSelectedAudio() {
+            const match = document.cookie.match(/(?:^|;\s*)selectedAudio=([^;]*)/);
+            return match ? decodeURIComponent(match[1]) : null;
+        }
+
         // CSVファイルを読み込んで音声メタデータを取得
         async function loadAudioMetadata() {
             try {
@@ -312,10 +325,12 @@
                 audioSelect.appendChild(option);
             });
 
-            // 最初のファイルを選択状態にして読み込む
+            // クッキーに保存された音源があればそれを選択、なければ最新（最後）の音源を選択
             if (audioFiles.length > 0) {
-                audioSelect.value = audioFiles[0];
-                changeAudio(audioFiles[0]);
+                const saved = getSelectedAudio();
+                const defaultFile = (saved && audioMetadata[saved]) ? saved : audioFiles[audioFiles.length - 1];
+                audioSelect.value = defaultFile;
+                changeAudio(defaultFile);
             }
         }
 
@@ -353,6 +368,7 @@
         // セレクトボックス変更時のイベント
         audioSelect.addEventListener('change', (e) => {
             changeAudio(e.target.value);
+            saveSelectedAudio(e.target.value);
         });
 
         // ページ読み込み時にメタデータを取得
