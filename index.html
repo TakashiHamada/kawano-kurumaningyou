@@ -19,7 +19,7 @@
 
         .player-container {
             background: white;
-            padding: 40px;
+            padding: 20px;
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             text-align: center;
@@ -29,14 +29,14 @@
         }
 
         .audio-player {
-            margin: 20px 0;
+            margin: 10px 0;
         }
 
         .button-container {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .play-button {
@@ -70,12 +70,12 @@
 
         audio {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 10px;
             outline: none;
         }
 
         .status {
-            margin-top: 15px;
+            margin-top: 8px;
             color: #666;
             font-size: 14px;
             min-height: 20px;
@@ -83,24 +83,24 @@
 
         .audio-info {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 20px;
+            padding: 10px 15px;
             border-radius: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             text-align: left;
         }
 
         .audio-info h2 {
             color: #333;
-            font-size: 20px;
-            margin: 0 0 15px 0;
+            font-size: 18px;
+            margin: 0 0 6px 0;
             border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            padding-bottom: 6px;
         }
 
         .info-item {
-            margin: 10px 0;
+            margin: 4px 0;
             color: #555;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .info-label {
@@ -111,15 +111,7 @@
         }
 
         .audio-selector {
-            margin-bottom: 20px;
-        }
-
-        .audio-selector label {
-            display: block;
-            color: #333;
-            font-weight: bold;
             margin-bottom: 10px;
-            font-size: 16px;
         }
 
         .audio-selector select {
@@ -147,9 +139,9 @@
         }
 
         .reload-button {
-            position: absolute;
-            top: 15px;
-            right: 15px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -164,6 +156,7 @@
             justify-content: center;
             font-size: 20px;
             touch-action: manipulation;
+            z-index: 100;
         }
 
         .reload-button:hover {
@@ -209,8 +202,8 @@
         }
 
         .loop-controls {
-            margin-top: 15px;
-            padding: 15px;
+            margin-top: 10px;
+            padding: 10px;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             border-radius: 15px;
         }
@@ -267,14 +260,7 @@
         }
 
         .speed-controls {
-            margin-top: 15px;
-        }
-
-        .speed-controls-label {
-            font-size: 14px;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 10px;
+            margin-top: 10px;
         }
 
         .speed-buttons {
@@ -328,11 +314,10 @@
         <div class="orientation-warning-text">画面を縦向きにしてください</div>
     </div>
 
-    <div class="player-container">
-        <button class="reload-button" id="reloadBtn" title="ページをリロード">🔄</button>
+    <button class="reload-button" id="reloadBtn" title="ページをリロード">🔄</button>
 
+    <div class="player-container">
         <div class="audio-selector">
-            <label for="audioSelect">音声を選択:</label>
             <select id="audioSelect">
                 <option value="">読み込み中...</option>
             </select>
@@ -373,7 +358,6 @@
         </div>
 
         <div class="speed-controls">
-            <div class="speed-controls-label">再生速度</div>
             <div class="speed-buttons">
                 <button class="speed-button" data-speed="0.5">0.5x</button>
                 <button class="speed-button" data-speed="0.75">0.75x</button>
