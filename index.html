@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>川野車人形練習アプリ</title>
+    <title>稽古の音八 - 川野車人形練習専用プレイヤー</title>
     <style>
         body {
             font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'MS PMincho', serif;
@@ -112,6 +112,29 @@
             color: #7A6040;
             display: inline-block;
             width: 100px;
+        }
+
+        .app-header {
+            margin-bottom: 12px;
+        }
+
+        .app-header-sub {
+            font-size: 11px;
+            color: #7A6A5A;
+            letter-spacing: 0.15em;
+        }
+
+        .app-header-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2A2A2A;
+            margin-top: 2px;
+        }
+
+        .app-header-ruby {
+            font-size: 11px;
+            color: #7A6040;
+            letter-spacing: 0.1em;
         }
 
         .audio-selector {
@@ -289,6 +312,12 @@
     </div>
 
     <div class="player-container">
+        <div class="app-header">
+            <div class="app-header-sub">川野車人形　練習専用プレイヤー</div>
+            <div class="app-header-title">稽古の音八</div>
+            <div class="app-header-ruby">おとはち</div>
+        </div>
+
         <div class="audio-selector">
             <select id="audioSelect">
                 <option value="">読み込み中...</option>
