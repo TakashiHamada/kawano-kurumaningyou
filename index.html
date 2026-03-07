@@ -3,179 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>川野車人形練習アプリ</title>
+    <title>稽古の音八 - 川野車人形練習専用プレイヤー</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'MS PMincho', serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            overflow: hidden;
+            background: #1B3A5C;
             touch-action: manipulation;
         }
 
         .player-container {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            background: #F5F0E8;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
             text-align: center;
             max-width: 400px;
             width: 90%;
             position: relative;
+            border: 1px solid #C4972F;
         }
 
         .audio-player {
-            margin: 20px 0;
+            margin: 10px 0;
         }
 
         .button-container {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 10px;
         }
 
         .play-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #C53D43;
+            color: #F5F0E8;
             border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            border-radius: 50px;
+            padding: 12px 0;
+            font-size: 16px;
+            font-family: inherit;
+            letter-spacing: 0.1em;
+            border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(197, 61, 67, 0.3);
             flex: 1;
             max-width: 150px;
             touch-action: manipulation;
         }
 
         .play-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            background: #A8333A;
+            box-shadow: 0 3px 10px rgba(197, 61, 67, 0.5);
         }
 
         .play-button:active {
-            transform: translateY(0);
+            background: #8E2B30;
         }
 
         .play-button:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
         audio {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 8px;
             outline: none;
         }
 
         .status {
-            margin-top: 15px;
-            color: #666;
-            font-size: 14px;
+            margin-top: 8px;
+            color: #7A6A5A;
+            font-size: 13px;
             min-height: 20px;
         }
 
         .audio-info {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
+            background: #EDE6DA;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
             text-align: left;
+            border-left: 3px solid #C4972F;
         }
 
         .audio-info h2 {
-            color: #333;
-            font-size: 20px;
-            margin: 0 0 15px 0;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            color: #2A2A2A;
+            font-size: 17px;
+            font-weight: bold;
+            margin: 0 0 6px 0;
+            border-bottom: 1px solid #C4972F;
+            padding-bottom: 6px;
         }
 
         .info-item {
-            margin: 10px 0;
-            color: #555;
-            font-size: 15px;
+            margin: 4px 0;
+            color: #4A4A4A;
+            font-size: 13px;
         }
 
         .info-label {
             font-weight: bold;
-            color: #667eea;
+            color: #7A6040;
             display: inline-block;
             width: 100px;
         }
 
-        .audio-selector {
-            margin-bottom: 20px;
+        .app-header {
+            margin-bottom: 12px;
         }
 
-        .audio-selector label {
-            display: block;
-            color: #333;
+        .app-header-sub {
+            font-size: 11px;
+            color: #7A6A5A;
+            letter-spacing: 0.15em;
+        }
+
+        .app-header-title {
+            font-size: 22px;
             font-weight: bold;
+            color: #2A2A2A;
+            margin-top: 2px;
+        }
+
+        .app-header-ruby {
+            font-size: 11px;
+            color: #7A6040;
+            letter-spacing: 0.1em;
+        }
+
+        .audio-selector {
             margin-bottom: 10px;
-            font-size: 16px;
         }
 
         .audio-selector select {
             width: 100%;
-            padding: 12px 15px;
-            font-size: 16px;
-            border: 2px solid #667eea;
-            border-radius: 10px;
-            background: white;
-            color: #333;
+            padding: 10px 12px;
+            font-size: 15px;
+            font-family: inherit;
+            border: 1px solid #C4972F;
+            border-radius: 4px;
+            background: #FFFDF8;
+            color: #2A2A2A;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             outline: none;
             touch-action: manipulation;
         }
 
         .audio-selector select:hover {
-            border-color: #764ba2;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            border-color: #A07828;
         }
 
         .audio-selector select:focus {
-            border-color: #764ba2;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            border-color: #A07828;
+            box-shadow: 0 0 0 2px rgba(196, 151, 47, 0.2);
         }
 
-        .reload-button {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            touch-action: manipulation;
-        }
-
-        .reload-button:hover {
-            transform: rotate(180deg) scale(1.1);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.6);
-        }
-
-        .reload-button:active {
-            transform: rotate(180deg) scale(0.95);
-        }
-
-        .orientation-warning {
+.orientation-warning {
             display: none;
             position: fixed;
             top: 0;
@@ -208,6 +198,103 @@
             50% { transform: rotate(90deg); }
         }
 
+        .loop-controls {
+            margin-top: 10px;
+            padding: 10px;
+            background: #EDE6DA;
+            border-radius: 4px;
+        }
+
+        .loop-controls-label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #7A6040;
+            margin-bottom: 8px;
+        }
+
+        .loop-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .loop-button {
+            background: #3A6B4C;
+            color: #F5F0E8;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-family: inherit;
+            letter-spacing: 0.05em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(58, 107, 76, 0.3);
+            touch-action: manipulation;
+        }
+
+        .loop-button:hover {
+            background: #2E5640;
+        }
+
+        .loop-button:active {
+            background: #234330;
+        }
+
+        .loop-button.clear-button {
+            background: #8A7060;
+            box-shadow: 0 2px 4px rgba(138, 112, 96, 0.3);
+        }
+
+        .loop-button.clear-button:hover {
+            background: #705A4C;
+        }
+
+        .loop-range-display {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #4A4A4A;
+            min-height: 20px;
+        }
+
+        .speed-controls {
+            margin-top: 10px;
+        }
+
+        .speed-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .speed-button {
+            background: #FFFDF8;
+            color: #4A4A4A;
+            border: 1px solid #C4972F;
+            padding: 7px 18px;
+            font-size: 14px;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
+
+        .speed-button:hover {
+            background: #F0E8D8;
+        }
+
+        .speed-button:active {
+            background: #E0D8C8;
+        }
+
+        .speed-button.active {
+            background: #C4972F;
+            color: #FFFDF8;
+            border-color: #C4972F;
+        }
+
         @media screen and (orientation: landscape) and (max-height: 500px) {
             .orientation-warning {
                 display: flex;
@@ -225,10 +312,13 @@
     </div>
 
     <div class="player-container">
-        <button class="reload-button" id="reloadBtn" title="ページをリロード">🔄</button>
+        <div class="app-header">
+            <div class="app-header-sub">川野車人形　練習専用プレイヤー</div>
+            <div class="app-header-title">稽古の音八</div>
+            <div class="app-header-ruby">おとはち</div>
+        </div>
 
         <div class="audio-selector">
-            <label for="audioSelect">音声を選択:</label>
             <select id="audioSelect">
                 <option value="">読み込み中...</option>
             </select>
@@ -247,7 +337,7 @@
         </div>
 
         <div class="audio-player">
-            <audio id="audioPlayer" controls>
+            <audio id="audioPlayer" controls loop>
                 <source src="" type="audio/mpeg">
                 お使いのブラウザは音声再生に対応していません。
             </audio>
@@ -255,7 +345,25 @@
 
         <div class="button-container">
             <button class="play-button" id="playPauseBtn">▶ 再生</button>
-            <button class="play-button" id="rewindBtn">⏪ 5秒戻す</button>
+            <button class="play-button" id="rewindBtn">5秒戻す</button>
+        </div>
+
+        <div class="loop-controls">
+            <div class="loop-controls-label">ループ範囲設定</div>
+            <div class="loop-buttons">
+                <button class="loop-button" id="loopStartBtn">ここから</button>
+                <button class="loop-button" id="loopEndBtn">ここまで</button>
+                <button class="loop-button clear-button" id="loopClearBtn">解除</button>
+            </div>
+            <div class="loop-range-display" id="loopRangeDisplay">全体をループ再生</div>
+        </div>
+
+        <div class="speed-controls">
+            <div class="speed-buttons">
+                <button class="speed-button" data-speed="0.6">0.6x</button>
+                <button class="speed-button" data-speed="0.8">0.8x</button>
+                <button class="speed-button active" data-speed="1">1.0x</button>
+            </div>
         </div>
 
         <div class="status" id="status"></div>
@@ -273,6 +381,14 @@
 
         let audioMetadata = {};
         let audioFiles = [];
+
+        // ループ範囲
+        let loopStart = null;
+        let loopEnd = null;
+        const loopStartBtn = document.getElementById('loopStartBtn');
+        const loopEndBtn = document.getElementById('loopEndBtn');
+        const loopClearBtn = document.getElementById('loopClearBtn');
+        const loopRangeDisplay = document.getElementById('loopRangeDisplay');
 
         // クッキーに選択音源を保存
         function saveSelectedAudio(filename) {
@@ -363,6 +479,14 @@
             // 再生状態をリセット
             status.textContent = '';
             updatePlayPauseButton();
+
+            // ループ範囲をリセット
+            clearLoopRange();
+
+            // 再生速度を1.0xにリセット
+            audio.playbackRate = 1;
+            document.querySelectorAll('.speed-button').forEach(b => b.classList.remove('active'));
+            document.querySelector('.speed-button[data-speed="1"]').classList.add('active');
         }
 
         // セレクトボックス変更時のイベント
@@ -374,18 +498,12 @@
         // ページ読み込み時にメタデータを取得
         window.addEventListener('DOMContentLoaded', loadAudioMetadata);
 
-        // リロードボタン
-        const reloadBtn = document.getElementById('reloadBtn');
-        reloadBtn.addEventListener('click', () => {
-            location.reload();
-        });
-
         // 再生/一時停止ボタンのテキストを更新
         function updatePlayPauseButton() {
             if (audio.paused) {
                 playPauseBtn.textContent = '▶ 再生';
             } else {
-                playPauseBtn.textContent = '⏸ 一時停止';
+                playPauseBtn.textContent = '一時停止';
             }
         }
 
@@ -404,10 +522,75 @@
             status.textContent = '5秒巻き戻しました';
         });
 
-        // 再生終了時
-        audio.addEventListener('ended', () => {
-            status.textContent = '再生が完了しました';
-            updatePlayPauseButton();
+        // --- ループ範囲機能 ---
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return m.toString().padStart(2, '0') + ':' + s.toString().padStart(2, '0');
+        }
+
+        function updateLoopRangeDisplay() {
+            if (loopStart !== null && loopEnd !== null) {
+                loopRangeDisplay.textContent = formatTime(loopStart) + ' → ' + formatTime(loopEnd) + ' をループ中';
+            } else if (loopStart !== null) {
+                loopRangeDisplay.textContent = formatTime(loopStart) + ' → （終了点を設定してください）';
+            } else {
+                loopRangeDisplay.textContent = '全体をループ再生';
+            }
+        }
+
+        function clearLoopRange() {
+            loopStart = null;
+            loopEnd = null;
+            updateLoopRangeDisplay();
+        }
+
+        loopStartBtn.addEventListener('click', () => {
+            loopStart = audio.currentTime;
+            // 開始点が終了点以降なら終了点をクリア
+            if (loopEnd !== null && loopStart >= loopEnd) {
+                loopEnd = null;
+            }
+            updateLoopRangeDisplay();
+            status.textContent = '開始点を ' + formatTime(loopStart) + ' に設定しました';
+        });
+
+        loopEndBtn.addEventListener('click', () => {
+            if (loopStart !== null && audio.currentTime <= loopStart) {
+                status.textContent = '終了点は開始点より後に設定してください';
+                return;
+            }
+            loopEnd = audio.currentTime;
+            if (loopStart === null) {
+                loopStart = 0;
+            }
+            updateLoopRangeDisplay();
+            status.textContent = '終了点を ' + formatTime(loopEnd) + ' に設定しました';
+        });
+
+        loopClearBtn.addEventListener('click', () => {
+            clearLoopRange();
+            status.textContent = 'ループ範囲を解除しました（全体ループ）';
+        });
+
+        // timeupdate でループ範囲を監視
+        audio.addEventListener('timeupdate', () => {
+            if (loopStart !== null && loopEnd !== null) {
+                if (audio.currentTime >= loopEnd) {
+                    audio.currentTime = loopStart;
+                }
+            }
+        });
+
+        // --- 再生速度ボタン ---
+        document.querySelectorAll('.speed-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const speed = parseFloat(btn.dataset.speed);
+                audio.playbackRate = speed;
+                document.querySelectorAll('.speed-button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                status.textContent = '再生速度: ' + speed + 'x';
+            });
         });
 
         // 再生中の状態更新
