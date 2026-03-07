@@ -208,6 +208,110 @@
             50% { transform: rotate(90deg); }
         }
 
+        .loop-controls {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+
+        .loop-controls-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .loop-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .loop-button {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            font-size: 14px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(67, 233, 123, 0.3);
+            touch-action: manipulation;
+        }
+
+        .loop-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 233, 123, 0.5);
+        }
+
+        .loop-button:active {
+            transform: translateY(0);
+        }
+
+        .loop-button.clear-button {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
+        }
+
+        .loop-button.clear-button:hover {
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.5);
+        }
+
+        .loop-range-display {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #555;
+            min-height: 22px;
+        }
+
+        .speed-controls {
+            margin-top: 15px;
+        }
+
+        .speed-controls-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .speed-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .speed-button {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 8px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .speed-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .speed-button:active {
+            transform: translateY(0);
+        }
+
+        .speed-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
         @media screen and (orientation: landscape) and (max-height: 500px) {
             .orientation-warning {
                 display: flex;
@@ -247,7 +351,7 @@
         </div>
 
         <div class="audio-player">
-            <audio id="audioPlayer" controls>
+            <audio id="audioPlayer" controls loop>
                 <source src="" type="audio/mpeg">
                 お使いのブラウザは音声再生に対応していません。
             </audio>
@@ -256,6 +360,25 @@
         <div class="button-container">
             <button class="play-button" id="playPauseBtn">▶ 再生</button>
             <button class="play-button" id="rewindBtn">⏪ 5秒戻す</button>
+        </div>
+
+        <div class="loop-controls">
+            <div class="loop-controls-label">ループ範囲設定</div>
+            <div class="loop-buttons">
+                <button class="loop-button" id="loopStartBtn">ここから</button>
+                <button class="loop-button" id="loopEndBtn">ここまで</button>
+                <button class="loop-button clear-button" id="loopClearBtn">解除</button>
+            </div>
+            <div class="loop-range-display" id="loopRangeDisplay">全体をループ再生</div>
+        </div>
+
+        <div class="speed-controls">
+            <div class="speed-controls-label">再生速度</div>
+            <div class="speed-buttons">
+                <button class="speed-button" data-speed="0.5">0.5x</button>
+                <button class="speed-button" data-speed="0.75">0.75x</button>
+                <button class="speed-button active" data-speed="1">1.0x</button>
+            </div>
         </div>
 
         <div class="status" id="status"></div>
@@ -273,6 +396,14 @@
 
         let audioMetadata = {};
         let audioFiles = [];
+
+        // ループ範囲
+        let loopStart = null;
+        let loopEnd = null;
+        const loopStartBtn = document.getElementById('loopStartBtn');
+        const loopEndBtn = document.getElementById('loopEndBtn');
+        const loopClearBtn = document.getElementById('loopClearBtn');
+        const loopRangeDisplay = document.getElementById('loopRangeDisplay');
 
         // クッキーに選択音源を保存
         function saveSelectedAudio(filename) {
@@ -363,6 +494,14 @@
             // 再生状態をリセット
             status.textContent = '';
             updatePlayPauseButton();
+
+            // ループ範囲をリセット
+            clearLoopRange();
+
+            // 再生速度を1.0xにリセット
+            audio.playbackRate = 1;
+            document.querySelectorAll('.speed-button').forEach(b => b.classList.remove('active'));
+            document.querySelector('.speed-button[data-speed="1"]').classList.add('active');
         }
 
         // セレクトボックス変更時のイベント
@@ -404,10 +543,75 @@
             status.textContent = '5秒巻き戻しました';
         });
 
-        // 再生終了時
-        audio.addEventListener('ended', () => {
-            status.textContent = '再生が完了しました';
-            updatePlayPauseButton();
+        // --- ループ範囲機能 ---
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return m.toString().padStart(2, '0') + ':' + s.toString().padStart(2, '0');
+        }
+
+        function updateLoopRangeDisplay() {
+            if (loopStart !== null && loopEnd !== null) {
+                loopRangeDisplay.textContent = formatTime(loopStart) + ' → ' + formatTime(loopEnd) + ' をループ中';
+            } else if (loopStart !== null) {
+                loopRangeDisplay.textContent = formatTime(loopStart) + ' → （終了点を設定してください）';
+            } else {
+                loopRangeDisplay.textContent = '全体をループ再生';
+            }
+        }
+
+        function clearLoopRange() {
+            loopStart = null;
+            loopEnd = null;
+            updateLoopRangeDisplay();
+        }
+
+        loopStartBtn.addEventListener('click', () => {
+            loopStart = audio.currentTime;
+            // 開始点が終了点以降なら終了点をクリア
+            if (loopEnd !== null && loopStart >= loopEnd) {
+                loopEnd = null;
+            }
+            updateLoopRangeDisplay();
+            status.textContent = '開始点を ' + formatTime(loopStart) + ' に設定しました';
+        });
+
+        loopEndBtn.addEventListener('click', () => {
+            if (loopStart !== null && audio.currentTime <= loopStart) {
+                status.textContent = '終了点は開始点より後に設定してください';
+                return;
+            }
+            loopEnd = audio.currentTime;
+            if (loopStart === null) {
+                loopStart = 0;
+            }
+            updateLoopRangeDisplay();
+            status.textContent = '終了点を ' + formatTime(loopEnd) + ' に設定しました';
+        });
+
+        loopClearBtn.addEventListener('click', () => {
+            clearLoopRange();
+            status.textContent = 'ループ範囲を解除しました（全体ループ）';
+        });
+
+        // timeupdate でループ範囲を監視
+        audio.addEventListener('timeupdate', () => {
+            if (loopStart !== null && loopEnd !== null) {
+                if (audio.currentTime >= loopEnd) {
+                    audio.currentTime = loopStart;
+                }
+            }
+        });
+
+        // --- 再生速度ボタン ---
+        document.querySelectorAll('.speed-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const speed = parseFloat(btn.dataset.speed);
+                audio.playbackRate = speed;
+                document.querySelectorAll('.speed-button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                status.textContent = '再生速度: ' + speed + 'x';
+            });
         });
 
         // 再生中の状態更新
