@@ -114,6 +114,24 @@
             width: 100px;
         }
 
+        .refresh-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #1B3A5C;
+            color: #F5F0E8;
+            border: 1px solid #C4972F;
+            border-radius: 4px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .refresh-button:active {
+            background: #2A4F7A;
+        }
+
         .app-header {
             margin-bottom: 12px;
         }
@@ -312,6 +330,7 @@
     </div>
 
     <div class="player-container">
+        <button class="refresh-button" onclick="location.reload()">更新</button>
         <div class="app-header">
             <div class="app-header-sub">川野車人形　練習専用プレイヤー</div>
             <div class="app-header-title">稽古の音八</div>
