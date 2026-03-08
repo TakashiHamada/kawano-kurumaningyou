@@ -489,7 +489,7 @@
         // 音声ファイルを切り替える
         function changeAudio(filename) {
             // 音声ソースを変更
-            audio.querySelector('source').src = filename;
+            audio.querySelector('source').src = 'audio/' + filename;
             audio.load();
 
             // メタデータを更新
