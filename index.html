@@ -443,6 +443,19 @@
                     }
                 }
 
+                // 各音声ファイルのサイズを取得
+                await Promise.all(audioFiles.map(async (filename) => {
+                    try {
+                        const res = await fetch('audio/' + filename, { method: 'HEAD' });
+                        const size = res.headers.get('Content-Length');
+                        if (size) {
+                            audioMetadata[filename].fileSizeMB = (parseInt(size) / (1024 * 1024)).toFixed(1);
+                        }
+                    } catch (e) {
+                        // ファイルサイズ取得失敗時は表示しない
+                    }
+                }));
+
                 // セレクトボックスのオプションを生成
                 populateAudioSelector();
             } catch (error) {
@@ -456,7 +469,8 @@
             audioFiles.forEach((filename) => {
                 const option = document.createElement('option');
                 option.value = filename;
-                option.textContent = audioMetadata[filename].title;
+                const meta = audioMetadata[filename];
+                option.textContent = meta.title + (meta.fileSizeMB ? ' [' + meta.fileSizeMB + 'MB]' : '');
                 audioSelect.appendChild(option);
             });
 
