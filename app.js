@@ -60,12 +60,16 @@
     async function loadAudioMetadata() {
         try {
             const response = await fetch(METADATA_CSV);
+            if (!response.ok) {
+                throw new Error('Failed to load metadata: ' + response.status + ' ' + response.statusText);
+            }
             const csvText = await response.text();
             parseCsv(csvText);
             await fetchFileSizes();
             populateAudioSelector();
         } catch (error) {
             console.error('メタデータの読み込みに失敗しました:', error);
+            setStatus('メタデータの読み込みに失敗しました。');
         }
     }
 
@@ -89,9 +93,12 @@
         await Promise.all(state.files.map(async (filename) => {
             try {
                 const res = await fetch(AUDIO_DIR + filename, { method: 'HEAD' });
+                if (!res.ok) return;
                 const size = res.headers.get('Content-Length');
-                if (size) {
-                    state.metadata[filename].fileSizeMB = (parseInt(size) / (1024 * 1024)).toFixed(1);
+                if (!size) return;
+                const sizeBytes = Number(size);
+                if (Number.isFinite(sizeBytes)) {
+                    state.metadata[filename].fileSizeMB = (sizeBytes / (1024 * 1024)).toFixed(1);
                 }
             } catch (e) {
                 // ファイルサイズ取得失敗時は表示しない
