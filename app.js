@@ -206,7 +206,7 @@
             dom.imageInline.appendChild(img);
         });
         dom.imageInline.hidden = false;
-        dom.imageToggleBtn.textContent = '×';
+        dom.imageToggleBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
         dom.imageToggleBtn.classList.add('showing');
         dom.imageToggleBtn.setAttribute('aria-label', '台本を閉じる');
     }
@@ -215,7 +215,7 @@
     function hideImages() {
         dom.imageInline.hidden = true;
         dom.imageInline.innerHTML = '';
-        dom.imageToggleBtn.textContent = '🖼';
+        dom.imageToggleBtn.innerHTML = '<i class="fa-regular fa-image"></i>';
         dom.imageToggleBtn.classList.remove('showing');
         dom.imageToggleBtn.setAttribute('aria-label', '台本を表示');
     }
