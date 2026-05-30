@@ -24,16 +24,8 @@
         loopRangeDisplay: document.getElementById('loopRangeDisplay'),
         speedButtons: document.querySelectorAll('.speed-button'),
         status: document.getElementById('status'),
-        imageButtonContainer: document.getElementById('imageButtonContainer'),
-        imageViewBtn: document.getElementById('imageViewBtn'),
-        imageModal: document.getElementById('imageModal'),
-        imageModalImg: document.getElementById('imageModalImg'),
-        imageModalViewport: document.getElementById('imageModalViewport'),
-        imageModalCounter: document.getElementById('imageModalCounter'),
-        imageModalNav: document.getElementById('imageModalNav'),
-        imageModalClose: document.getElementById('imageModalClose'),
-        imagePrevBtn: document.getElementById('imagePrevBtn'),
-        imageNextBtn: document.getElementById('imageNextBtn'),
+        imageToggleBtn: document.getElementById('imageToggleBtn'),
+        imageInline: document.getElementById('imageInline'),
     };
 
     const state = {
@@ -43,7 +35,6 @@
         loopStart: null,
         loopEnd: null,
         currentImages: [],
-        imageIndex: 0,
     };
 
     // --- ユーティリティ ---
@@ -175,59 +166,58 @@
 
         setControlsEnabled(true);
         updateAudioInfo();
-        updateImageButton();
+        updateImageToggle();
         setStatus('');
         updatePlayPauseButton();
         clearLoopRange();
         resetSpeed();
     }
 
-    // --- 関連画像（台本）ビューア ---
-    function updateImageButton() {
+    // --- 関連画像（台本） ---
+    // audio-info 右下のアイコンの状態を更新する。
+    // 参照画像があればアクティブ（押せる）、なければ非アクティブにする。
+    function updateImageToggle() {
         const meta = state.metadata[state.currentFile];
-        const images = (meta && meta.images) || [];
-        state.currentImages = images;
-        dom.imageButtonContainer.hidden = images.length === 0;
+        state.currentImages = (meta && meta.images) || [];
+        hideImages();
+        dom.imageToggleBtn.disabled = state.currentImages.length === 0;
     }
 
-    function openImageModal() {
+    function toggleImages() {
+        if (dom.imageToggleBtn.disabled) return;
+        if (dom.imageInline.hidden) {
+            showImages();
+        } else {
+            hideImages();
+        }
+    }
+
+    // audio-info の下に関連画像を表示し、アイコンを × に切り替える
+    function showImages() {
         if (state.currentImages.length === 0) return;
-        state.imageIndex = 0;
-        renderImage();
-        dom.imageModal.hidden = false;
+        dom.imageInline.innerHTML = '';
+        state.currentImages.forEach((src) => {
+            const img = document.createElement('img');
+            img.className = 'image-inline-img';
+            img.src = src;
+            img.alt = '台本';
+            // タップで拡大・縮小を切り替え
+            img.addEventListener('click', () => img.classList.toggle('zoomed'));
+            dom.imageInline.appendChild(img);
+        });
+        dom.imageInline.hidden = false;
+        dom.imageToggleBtn.textContent = '×';
+        dom.imageToggleBtn.classList.add('showing');
+        dom.imageToggleBtn.setAttribute('aria-label', '台本を閉じる');
     }
 
-    function closeImageModal() {
-        dom.imageModal.hidden = true;
-        dom.imageModalImg.classList.remove('zoomed');
-    }
-
-    function renderImage() {
-        const total = state.currentImages.length;
-        const src = state.currentImages[state.imageIndex];
-        dom.imageModalImg.src = src;
-        dom.imageModalImg.classList.remove('zoomed');
-        dom.imageModalViewport.scrollTop = 0;
-        dom.imageModalViewport.scrollLeft = 0;
-        dom.imageModalCounter.textContent = (state.imageIndex + 1) + ' / ' + total;
-        // 画像が1枚だけのときは前後ボタンを隠す
-        dom.imageModalNav.hidden = total <= 1;
-        dom.imagePrevBtn.disabled = state.imageIndex === 0;
-        dom.imageNextBtn.disabled = state.imageIndex === total - 1;
-    }
-
-    function showPrevImage() {
-        if (state.imageIndex > 0) {
-            state.imageIndex--;
-            renderImage();
-        }
-    }
-
-    function showNextImage() {
-        if (state.imageIndex < state.currentImages.length - 1) {
-            state.imageIndex++;
-            renderImage();
-        }
+    // 画像を隠し、アイコンを画像アイコンに戻す
+    function hideImages() {
+        dom.imageInline.hidden = true;
+        dom.imageInline.innerHTML = '';
+        dom.imageToggleBtn.textContent = '🖼';
+        dom.imageToggleBtn.classList.remove('showing');
+        dom.imageToggleBtn.setAttribute('aria-label', '台本を表示');
     }
 
     function updateAudioInfo() {
@@ -348,23 +338,8 @@
             });
         });
 
-        // 関連画像（台本）ビューア
-        dom.imageViewBtn.addEventListener('click', openImageModal);
-        dom.imageModalClose.addEventListener('click', closeImageModal);
-        dom.imagePrevBtn.addEventListener('click', showPrevImage);
-        dom.imageNextBtn.addEventListener('click', showNextImage);
-        // 画像タップで拡大・縮小をトグル
-        dom.imageModalImg.addEventListener('click', () => {
-            dom.imageModalImg.classList.toggle('zoomed');
-        });
-        // 背景（画像以外）のタップで閉じる
-        dom.imageModalViewport.addEventListener('click', (e) => {
-            if (e.target === dom.imageModalViewport) closeImageModal();
-        });
-        // Esc キーで閉じる
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !dom.imageModal.hidden) closeImageModal();
-        });
+        // 関連画像（台本）の表示・非表示トグル
+        dom.imageToggleBtn.addEventListener('click', toggleImages);
 
         dom.audio.addEventListener('timeupdate', enforceLoop);
         dom.audio.addEventListener('play', () => {
