@@ -50,6 +50,10 @@
             <button class="play-button" id="rewindBtn">5秒戻す</button>
         </div>
 
+        <div class="image-button-container" id="imageButtonContainer" hidden>
+            <button class="image-view-button" id="imageViewBtn">📖 台本を見る</button>
+        </div>
+
         <div class="loop-controls">
             <div class="loop-controls-label">ループ範囲設定</div>
             <div class="loop-buttons">
@@ -69,6 +73,20 @@
         </div>
 
         <div class="status" id="status"></div>
+    </div>
+
+    <div class="image-modal" id="imageModal" hidden>
+        <div class="image-modal-bar">
+            <span class="image-modal-counter" id="imageModalCounter">1 / 1</span>
+            <button class="image-modal-close" id="imageModalClose" aria-label="閉じる">×</button>
+        </div>
+        <div class="image-modal-viewport" id="imageModalViewport">
+            <img class="image-modal-img" id="imageModalImg" src="" alt="台本">
+        </div>
+        <div class="image-modal-nav" id="imageModalNav">
+            <button class="image-nav-button" id="imagePrevBtn" aria-label="前の画像">‹ 前</button>
+            <button class="image-nav-button" id="imageNextBtn" aria-label="次の画像">次 ›</button>
+        </div>
     </div>
 
     <script src="app.js"></script>

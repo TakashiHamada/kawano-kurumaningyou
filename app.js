@@ -21,6 +21,16 @@
         loopRangeDisplay: document.getElementById('loopRangeDisplay'),
         speedButtons: document.querySelectorAll('.speed-button'),
         status: document.getElementById('status'),
+        imageButtonContainer: document.getElementById('imageButtonContainer'),
+        imageViewBtn: document.getElementById('imageViewBtn'),
+        imageModal: document.getElementById('imageModal'),
+        imageModalImg: document.getElementById('imageModalImg'),
+        imageModalViewport: document.getElementById('imageModalViewport'),
+        imageModalCounter: document.getElementById('imageModalCounter'),
+        imageModalNav: document.getElementById('imageModalNav'),
+        imageModalClose: document.getElementById('imageModalClose'),
+        imagePrevBtn: document.getElementById('imagePrevBtn'),
+        imageNextBtn: document.getElementById('imageNextBtn'),
     };
 
     const state = {
@@ -29,6 +39,8 @@
         currentFile: null,
         loopStart: null,
         loopEnd: null,
+        currentImages: [],
+        imageIndex: 0,
     };
 
     // --- ユーティリティ ---
@@ -80,11 +92,13 @@
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line) continue;
-            const [filename, title, speakerName, date] = line.split(',');
+            const [filename, title, speakerName, date, images] = line.split(',');
             state.metadata[filename] = {
                 title: title,
                 speaker: speakerName,
                 recordedDate: date,
+                // 画像列は「|」区切りで複数指定可。未指定なら空配列。
+                images: images ? images.trim().split('|').map(s => s.trim()).filter(Boolean) : [],
             };
             state.files.push(filename);
         }
@@ -139,10 +153,59 @@
 
         setControlsEnabled(true);
         updateAudioInfo();
+        updateImageButton();
         setStatus('');
         updatePlayPauseButton();
         clearLoopRange();
         resetSpeed();
+    }
+
+    // --- 関連画像（台本）ビューア ---
+    function updateImageButton() {
+        const meta = state.metadata[state.currentFile];
+        const images = (meta && meta.images) || [];
+        state.currentImages = images;
+        dom.imageButtonContainer.hidden = images.length === 0;
+    }
+
+    function openImageModal() {
+        if (state.currentImages.length === 0) return;
+        state.imageIndex = 0;
+        renderImage();
+        dom.imageModal.hidden = false;
+    }
+
+    function closeImageModal() {
+        dom.imageModal.hidden = true;
+        dom.imageModalImg.classList.remove('zoomed');
+    }
+
+    function renderImage() {
+        const total = state.currentImages.length;
+        const src = state.currentImages[state.imageIndex];
+        dom.imageModalImg.src = src;
+        dom.imageModalImg.classList.remove('zoomed');
+        dom.imageModalViewport.scrollTop = 0;
+        dom.imageModalViewport.scrollLeft = 0;
+        dom.imageModalCounter.textContent = (state.imageIndex + 1) + ' / ' + total;
+        // 画像が1枚だけのときは前後ボタンを隠す
+        dom.imageModalNav.hidden = total <= 1;
+        dom.imagePrevBtn.disabled = state.imageIndex === 0;
+        dom.imageNextBtn.disabled = state.imageIndex === total - 1;
+    }
+
+    function showPrevImage() {
+        if (state.imageIndex > 0) {
+            state.imageIndex--;
+            renderImage();
+        }
+    }
+
+    function showNextImage() {
+        if (state.imageIndex < state.currentImages.length - 1) {
+            state.imageIndex++;
+            renderImage();
+        }
     }
 
     function updateAudioInfo() {
@@ -261,6 +324,24 @@
             btn.addEventListener('click', () => {
                 setSpeed(parseFloat(btn.dataset.speed), btn);
             });
+        });
+
+        // 関連画像（台本）ビューア
+        dom.imageViewBtn.addEventListener('click', openImageModal);
+        dom.imageModalClose.addEventListener('click', closeImageModal);
+        dom.imagePrevBtn.addEventListener('click', showPrevImage);
+        dom.imageNextBtn.addEventListener('click', showNextImage);
+        // 画像タップで拡大・縮小をトグル
+        dom.imageModalImg.addEventListener('click', () => {
+            dom.imageModalImg.classList.toggle('zoomed');
+        });
+        // 背景（画像以外）のタップで閉じる
+        dom.imageModalViewport.addEventListener('click', (e) => {
+            if (e.target === dom.imageModalViewport) closeImageModal();
+        });
+        // Esc キーで閉じる
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !dom.imageModal.hidden) closeImageModal();
         });
 
         dom.audio.addEventListener('timeupdate', enforceLoop);
