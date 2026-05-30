@@ -2,6 +2,9 @@
     'use strict';
 
     const AUDIO_DIR = 'audio/';
+    const IMG_DIR = 'img/';
+    // 音声と同名（拡張子違い）の画像を img/ から自動的に探す際の対象拡張子
+    const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png'];
     const METADATA_CSV = 'audio_metadata.csv';
     const DEFAULT_SPEED = 1;
     const REWIND_SECONDS = 5;
@@ -79,6 +82,7 @@
             const csvText = await response.text();
             parseCsv(csvText);
             await fetchFileSizes();
+            await fetchRelatedImages();
             populateAudioSelector();
         } catch (error) {
             console.error('メタデータの読み込みに失敗しました:', error);
@@ -92,13 +96,13 @@
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line) continue;
-            const [filename, title, speakerName, date, images] = line.split(',');
+            const [filename, title, speakerName, date] = line.split(',');
             state.metadata[filename] = {
                 title: title,
                 speaker: speakerName,
                 recordedDate: date,
-                // 画像列は「|」区切りで複数指定可。未指定なら空配列。
-                images: images ? images.trim().split('|').map(s => s.trim()).filter(Boolean) : [],
+                // 関連画像は img/ から音声と同名のファイルを探して設定する
+                images: [],
             };
             state.files.push(filename);
         }
@@ -118,6 +122,24 @@
             } catch (e) {
                 // ファイルサイズ取得失敗時は表示しない
             }
+        }));
+    }
+
+    // img/ に音声ファイルと同名（拡張子違い）の画像があれば関連画像として登録する
+    async function fetchRelatedImages() {
+        await Promise.all(state.files.map(async (filename) => {
+            const baseName = filename.replace(/\.[^/.]+$/, '');
+            const images = [];
+            for (const ext of IMAGE_EXTENSIONS) {
+                const path = IMG_DIR + baseName + '.' + ext;
+                try {
+                    const res = await fetch(path, { method: 'HEAD' });
+                    if (res.ok) images.push(path);
+                } catch (e) {
+                    // 画像が存在しない場合は無視する
+                }
+            }
+            state.metadata[filename].images = images;
         }));
     }
 
