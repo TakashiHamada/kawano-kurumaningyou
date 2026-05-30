@@ -3,7 +3,6 @@
 
     const AUDIO_DIR = 'audio/';
     const METADATA_CSV = 'audio_metadata.csv';
-    const COOKIE_NAME = 'selectedAudio';
     const DEFAULT_SPEED = 1;
     const REWIND_SECONDS = 5;
 
@@ -43,17 +42,19 @@
         dom.status.textContent = message;
     }
 
-    // --- クッキー ---
-    function saveSelectedAudio(filename) {
-        const expires = new Date();
-        expires.setFullYear(expires.getFullYear() + 1);
-        document.cookie = COOKIE_NAME + '=' + encodeURIComponent(filename) +
-            '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax';
-    }
-
-    function getSelectedAudio() {
-        const match = document.cookie.match(new RegExp('(?:^|;\\s*)' + COOKIE_NAME + '=([^;]*)'));
-        return match ? decodeURIComponent(match[1]) : null;
+    // 音声が未選択の間は再生系ボタンを無効化する
+    function setControlsEnabled(enabled) {
+        const buttons = [
+            dom.playPauseBtn,
+            dom.rewindBtn,
+            dom.loopStartBtn,
+            dom.loopEndBtn,
+            dom.loopClearBtn,
+            ...dom.speedButtons,
+        ];
+        buttons.forEach((btn) => {
+            if (btn) btn.disabled = !enabled;
+        });
     }
 
     // --- メタデータ読み込み ---
@@ -108,6 +109,13 @@
 
     function populateAudioSelector() {
         dom.audioSelect.innerHTML = '';
+
+        // 先頭にプレースホルダーを表示し、起動時は音声を自動ダウンロードしない
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = '音声を選択してください';
+        dom.audioSelect.appendChild(placeholder);
+
         state.files.forEach((filename) => {
             const option = document.createElement('option');
             option.value = filename;
@@ -116,13 +124,11 @@
             dom.audioSelect.appendChild(option);
         });
 
-        if (state.files.length === 0) return;
-
-        // クッキーに保存された音源、なければ最新（最後）の音源を選択
-        const saved = getSelectedAudio();
-        const defaultFile = (saved && state.metadata[saved]) ? saved : state.files[state.files.length - 1];
-        dom.audioSelect.value = defaultFile;
-        changeAudio(defaultFile);
+        // ユーザーが任意で選択するまでダウンロードしないため、ここでは自動選択しない
+        // 音声未選択の間は再生系ボタンを無効化しておく
+        dom.audioSelect.value = '';
+        setControlsEnabled(false);
+        setStatus('');
     }
 
     // --- 音声切り替え ---
@@ -131,6 +137,7 @@
         dom.audioSource.src = AUDIO_DIR + filename;
         dom.audio.load();
 
+        setControlsEnabled(true);
         updateAudioInfo();
         setStatus('');
         updatePlayPauseButton();
@@ -236,8 +243,8 @@
     // --- イベント登録 ---
     function bindEvents() {
         dom.audioSelect.addEventListener('change', (e) => {
+            if (!e.target.value) return; // プレースホルダー選択時は何もしない
             changeAudio(e.target.value);
-            saveSelectedAudio(e.target.value);
         });
 
         dom.playPauseBtn.addEventListener('click', togglePlayPause);
@@ -272,6 +279,8 @@
     // --- 初期化 ---
     window.addEventListener('DOMContentLoaded', () => {
         bindEvents();
+        // メタデータ読み込み・音声選択が済むまで再生系ボタンを無効化
+        setControlsEnabled(false);
         loadAudioMetadata();
     });
 })();
