@@ -2,6 +2,9 @@
     'use strict';
 
     const AUDIO_DIR = 'audio/';
+    const IMG_DIR = 'img/';
+    // 音声と同名（拡張子違い）の画像を img/ から自動的に探す際の対象拡張子
+    const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png'];
     const METADATA_CSV = 'audio_metadata.csv';
     const DEFAULT_SPEED = 1;
     const REWIND_SECONDS = 5;
@@ -21,6 +24,8 @@
         loopRangeDisplay: document.getElementById('loopRangeDisplay'),
         speedButtons: document.querySelectorAll('.speed-button'),
         status: document.getElementById('status'),
+        imageToggleBtn: document.getElementById('imageToggleBtn'),
+        imageInline: document.getElementById('imageInline'),
     };
 
     const state = {
@@ -29,6 +34,7 @@
         currentFile: null,
         loopStart: null,
         loopEnd: null,
+        currentImages: [],
     };
 
     // --- ユーティリティ ---
@@ -66,7 +72,8 @@
             }
             const csvText = await response.text();
             parseCsv(csvText);
-            await fetchFileSizes();
+            // ファイルサイズ取得と関連画像探索は独立しているので並列化する
+            await Promise.all([fetchFileSizes(), fetchRelatedImages()]);
             populateAudioSelector();
         } catch (error) {
             console.error('メタデータの読み込みに失敗しました:', error);
@@ -85,6 +92,8 @@
                 title: title,
                 speaker: speakerName,
                 recordedDate: date,
+                // 関連画像は img/ から音声と同名のファイルを探して設定する
+                images: [],
             };
             state.files.push(filename);
         }
@@ -104,6 +113,24 @@
             } catch (e) {
                 // ファイルサイズ取得失敗時は表示しない
             }
+        }));
+    }
+
+    // img/ に音声ファイルと同名（拡張子違い）の画像があれば関連画像として登録する
+    async function fetchRelatedImages() {
+        await Promise.all(state.files.map(async (filename) => {
+            const baseName = filename.replace(/\.[^/.]+$/, '');
+            const images = [];
+            for (const ext of IMAGE_EXTENSIONS) {
+                const path = IMG_DIR + baseName + '.' + ext;
+                try {
+                    const res = await fetch(path, { method: 'HEAD' });
+                    if (res.ok) images.push(path);
+                } catch (e) {
+                    // 画像が存在しない場合は無視する
+                }
+            }
+            state.metadata[filename].images = images;
         }));
     }
 
@@ -139,10 +166,60 @@
 
         setControlsEnabled(true);
         updateAudioInfo();
+        updateImageToggle();
         setStatus('');
         updatePlayPauseButton();
         clearLoopRange();
         resetSpeed();
+    }
+
+    // --- 関連画像（台本） ---
+    // audio-info 右下のアイコンの状態を更新する。
+    // 参照画像があればアクティブ（押せる）、なければ非アクティブにする。
+    function updateImageToggle() {
+        const meta = state.metadata[state.currentFile];
+        state.currentImages = (meta && meta.images) || [];
+        hideImages();
+        dom.imageToggleBtn.disabled = state.currentImages.length === 0;
+    }
+
+    function toggleImages() {
+        if (dom.imageToggleBtn.disabled) return;
+        if (dom.imageInline.hidden) {
+            showImages();
+        } else {
+            hideImages();
+        }
+    }
+
+    // audio-info の下に関連画像を表示し、アイコンを × に切り替える
+    function showImages() {
+        if (state.currentImages.length === 0) return;
+        dom.imageInline.innerHTML = '';
+        const total = state.currentImages.length;
+        state.currentImages.forEach((src, index) => {
+            const img = document.createElement('img');
+            img.className = 'image-inline-img';
+            img.src = src;
+            // 複数枚あるときはスクリーンリーダー用に連番で区別する
+            img.alt = total > 1 ? '台本 ' + (index + 1) : '台本';
+            // タップで拡大・縮小を切り替え
+            img.addEventListener('click', () => img.classList.toggle('zoomed'));
+            dom.imageInline.appendChild(img);
+        });
+        dom.imageInline.hidden = false;
+        dom.imageToggleBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        dom.imageToggleBtn.classList.add('showing');
+        dom.imageToggleBtn.setAttribute('aria-label', '台本を閉じる');
+    }
+
+    // 画像を隠し、アイコンを画像アイコンに戻す
+    function hideImages() {
+        dom.imageInline.hidden = true;
+        dom.imageInline.innerHTML = '';
+        dom.imageToggleBtn.innerHTML = '<i class="fa-regular fa-image"></i>';
+        dom.imageToggleBtn.classList.remove('showing');
+        dom.imageToggleBtn.setAttribute('aria-label', '台本を表示');
     }
 
     function updateAudioInfo() {
@@ -262,6 +339,9 @@
                 setSpeed(parseFloat(btn.dataset.speed), btn);
             });
         });
+
+        // 関連画像（台本）の表示・非表示トグル
+        dom.imageToggleBtn.addEventListener('click', toggleImages);
 
         dom.audio.addEventListener('timeupdate', enforceLoop);
         dom.audio.addEventListener('play', () => {

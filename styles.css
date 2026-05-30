@@ -83,6 +83,8 @@ audio {
     margin-bottom: 10px;
     text-align: left;
     border-left: 3px solid #C4972F;
+    /* 右下の台本アイコンを絶対配置するための基準 */
+    position: relative;
 }
 
 .audio-info h2 {
@@ -314,6 +316,81 @@ audio {
 .speed-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* --- 関連画像（台本）アイコン --- */
+.image-toggle {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1;
+    background: #C4972F;
+    color: #FFFDF8;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(196, 151, 47, 0.4);
+    touch-action: manipulation;
+}
+
+.image-toggle:active {
+    background: #A07828;
+}
+
+/* 参照画像がないときは非アクティブ表示 */
+.image-toggle:disabled {
+    background: #D8CFBE;
+    color: #B0A690;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* 画像表示中は × ボタン表示 */
+.image-toggle.showing {
+    background: #8A7060;
+    box-shadow: 0 2px 4px rgba(138, 112, 96, 0.4);
+}
+
+/* --- 関連画像（台本）インライン表示 --- */
+.image-inline {
+    margin-bottom: 10px;
+    padding: 8px;
+    background: #EDE6DA;
+    border-radius: 4px;
+    border-left: 3px solid #C4972F;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    text-align: center;
+}
+
+.image-inline[hidden] {
+    display: none;
+}
+
+.image-inline-img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto 8px;
+    border: 1px solid #C4972F;
+    border-radius: 2px;
+    cursor: zoom-in;
+}
+
+.image-inline-img:last-child {
+    margin-bottom: 0;
+}
+
+/* タップで拡大（横スクロールで全体を確認） */
+.image-inline-img.zoomed {
+    max-width: none;
+    width: 200%;
+    cursor: zoom-out;
 }
 
 @media screen and (orientation: landscape) and (max-height: 500px) {
