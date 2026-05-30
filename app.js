@@ -72,8 +72,8 @@
             }
             const csvText = await response.text();
             parseCsv(csvText);
-            await fetchFileSizes();
-            await fetchRelatedImages();
+            // ファイルサイズ取得と関連画像探索は独立しているので並列化する
+            await Promise.all([fetchFileSizes(), fetchRelatedImages()]);
             populateAudioSelector();
         } catch (error) {
             console.error('メタデータの読み込みに失敗しました:', error);
@@ -196,11 +196,13 @@
     function showImages() {
         if (state.currentImages.length === 0) return;
         dom.imageInline.innerHTML = '';
-        state.currentImages.forEach((src) => {
+        const total = state.currentImages.length;
+        state.currentImages.forEach((src, index) => {
             const img = document.createElement('img');
             img.className = 'image-inline-img';
             img.src = src;
-            img.alt = '台本';
+            // 複数枚あるときはスクリーンリーダー用に連番で区別する
+            img.alt = total > 1 ? '台本 ' + (index + 1) : '台本';
             // タップで拡大・縮小を切り替え
             img.addEventListener('click', () => img.classList.toggle('zoomed'));
             dom.imageInline.appendChild(img);

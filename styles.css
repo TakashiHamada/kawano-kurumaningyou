@@ -83,6 +83,8 @@ audio {
     margin-bottom: 10px;
     text-align: left;
     border-left: 3px solid #C4972F;
+    /* 右下の台本アイコンを絶対配置するための基準 */
+    position: relative;
 }
 
 .audio-info h2 {
@@ -317,10 +319,6 @@ audio {
 }
 
 /* --- 関連画像（台本）アイコン --- */
-.audio-info {
-    position: relative;
-}
-
 .image-toggle {
     position: absolute;
     right: 8px;
