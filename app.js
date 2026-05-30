@@ -42,6 +42,21 @@
         dom.status.textContent = message;
     }
 
+    // 音声が未選択の間は再生系ボタンを無効化する
+    function setControlsEnabled(enabled) {
+        const buttons = [
+            dom.playPauseBtn,
+            dom.rewindBtn,
+            dom.loopStartBtn,
+            dom.loopEndBtn,
+            dom.loopClearBtn,
+            ...dom.speedButtons,
+        ];
+        buttons.forEach((btn) => {
+            if (btn) btn.disabled = !enabled;
+        });
+    }
+
     // --- メタデータ読み込み ---
     async function loadAudioMetadata() {
         try {
@@ -110,7 +125,9 @@
         });
 
         // ユーザーが任意で選択するまでダウンロードしないため、ここでは自動選択しない
+        // 音声未選択の間は再生系ボタンを無効化しておく
         dom.audioSelect.value = '';
+        setControlsEnabled(false);
         setStatus('');
     }
 
@@ -120,6 +137,7 @@
         dom.audioSource.src = AUDIO_DIR + filename;
         dom.audio.load();
 
+        setControlsEnabled(true);
         updateAudioInfo();
         setStatus('');
         updatePlayPauseButton();
@@ -261,6 +279,8 @@
     // --- 初期化 ---
     window.addEventListener('DOMContentLoaded', () => {
         bindEvents();
+        // メタデータ読み込み・音声選択が済むまで再生系ボタンを無効化
+        setControlsEnabled(false);
         loadAudioMetadata();
     });
 })();

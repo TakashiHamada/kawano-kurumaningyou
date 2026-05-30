@@ -261,6 +261,11 @@ audio {
     background: #705A4C;
 }
 
+.loop-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .loop-range-display {
     margin-top: 8px;
     font-size: 14px;
@@ -304,6 +309,11 @@ audio {
     background: #C4972F;
     color: #FFFDF8;
     border-color: #C4972F;
+}
+
+.speed-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 @media screen and (orientation: landscape) and (max-height: 500px) {
