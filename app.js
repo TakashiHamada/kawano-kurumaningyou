@@ -34,6 +34,8 @@
         currentFile: null,
         loopStart: null,
         loopEnd: null,
+        // 直前の timeupdate 時点の再生位置（終了点を「再生で通過した」かの判定用）
+        lastTime: 0,
         currentImages: [],
     };
 
@@ -163,6 +165,7 @@
         state.currentFile = filename;
         dom.audioSource.src = AUDIO_DIR + filename;
         dom.audio.load();
+        state.lastTime = 0;
 
         setControlsEnabled(true);
         updateAudioInfo();
@@ -295,11 +298,22 @@
         }
     }
 
+    // 再生が終了点を通過したときだけ開始点へ戻す。
+    // スライダー操作で終了点より後へ移動した場合はそのまま再生を続ける。
     function enforceLoop() {
+        const current = dom.audio.currentTime;
+        const previous = state.lastTime;
+        state.lastTime = current;
+        if (dom.audio.seeking) return;
         if (state.loopStart !== null && state.loopEnd !== null &&
-            dom.audio.currentTime >= state.loopEnd) {
+            previous < state.loopEnd && current >= state.loopEnd) {
             dom.audio.currentTime = state.loopStart;
         }
+    }
+
+    // シーク（スライダー操作・巻き戻し・ループ）後の位置を基準にし直す
+    function handleSeeking() {
+        state.lastTime = dom.audio.currentTime;
     }
 
     // --- 再生速度 ---
@@ -344,6 +358,7 @@
         dom.imageToggleBtn.addEventListener('click', toggleImages);
 
         dom.audio.addEventListener('timeupdate', enforceLoop);
+        dom.audio.addEventListener('seeking', handleSeeking);
         dom.audio.addEventListener('play', () => {
             setStatus('再生中...');
             updatePlayPauseButton();
