@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>稽古の音八 - 川野車人形練習専用プレイヤー</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="styles.css">
+    <script type="module" src="app.js"></script>
 </head>
 <body>
     <div class="orientation-warning">
@@ -13,21 +13,21 @@
         <div class="orientation-warning-text">画面を縦向きにしてください</div>
     </div>
 
-    <div class="player-container">
-        <button class="refresh-button" onclick="location.reload()">更新</button>
-        <div class="app-header">
+    <main class="player-container">
+        <button type="button" class="refresh-button" id="refreshBtn">更新</button>
+        <header class="app-header">
             <div class="app-header-sub">川野車人形　練習専用プレイヤー</div>
-            <div class="app-header-title">稽古の音八</div>
+            <h1 class="app-header-title">稽古の音八</h1>
             <div class="app-header-ruby">おとはち</div>
-        </div>
+        </header>
 
         <div class="audio-selector">
-            <select id="audioSelect">
+            <select id="audioSelect" aria-label="音声を選択">
                 <option value="">音声を選択してください</option>
             </select>
         </div>
 
-        <div class="audio-info" id="audioInfo">
+        <div class="audio-info">
             <h2 id="audioTitle">音声情報</h2>
             <div class="info-item">
                 <span class="info-label">話者:</span>
@@ -37,44 +37,50 @@
                 <span class="info-label">収録年月日:</span>
                 <span id="recordedDate">-</span>
             </div>
-            <button type="button" class="image-toggle" id="imageToggleBtn" aria-label="台本を表示" disabled><i class="fa-regular fa-image"></i></button>
+            <button type="button" class="image-toggle" id="imageToggleBtn" aria-label="台本を表示" aria-expanded="false" aria-controls="imageInline" disabled>
+                <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <path d="M21 15l-5-5L5 21"/>
+                </svg>
+                <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
         </div>
 
         <div class="image-inline" id="imageInline" hidden></div>
 
         <div class="audio-player">
             <audio id="audioPlayer" controls loop>
-                <source src="" type="audio/mpeg">
                 お使いのブラウザは音声再生に対応していません。
             </audio>
         </div>
 
         <div class="button-container">
-            <button class="play-button" id="playPauseBtn">▶ 再生</button>
-            <button class="play-button" id="rewindBtn">5秒戻す</button>
+            <button type="button" class="play-button" id="playPauseBtn" disabled>▶ 再生</button>
+            <button type="button" class="play-button" id="rewindBtn" disabled>5秒戻す</button>
         </div>
 
         <div class="loop-controls">
             <div class="loop-controls-label">ループ範囲設定</div>
             <div class="loop-buttons">
-                <button class="loop-button" id="loopStartBtn">ここから</button>
-                <button class="loop-button" id="loopEndBtn">ここまで</button>
-                <button class="loop-button clear-button" id="loopClearBtn">解除</button>
+                <button type="button" class="loop-button" id="loopStartBtn" disabled>ここから</button>
+                <button type="button" class="loop-button" id="loopEndBtn" disabled>ここまで</button>
+                <button type="button" class="loop-button clear-button" id="loopClearBtn" disabled>解除</button>
             </div>
-            <div class="loop-range-display" id="loopRangeDisplay">全体をループ再生</div>
+            <div class="loop-range-display" id="loopRangeDisplay" aria-live="polite">全体をループ再生</div>
         </div>
 
         <div class="speed-controls">
-            <div class="speed-buttons">
-                <button class="speed-button" data-speed="0.6">0.6x</button>
-                <button class="speed-button" data-speed="0.8">0.8x</button>
-                <button class="speed-button active" data-speed="1">1.0x</button>
+            <div class="speed-buttons" role="group" aria-label="再生速度">
+                <button type="button" class="speed-button" data-speed="0.6" aria-pressed="false" disabled>0.6x</button>
+                <button type="button" class="speed-button" data-speed="0.8" aria-pressed="false" disabled>0.8x</button>
+                <button type="button" class="speed-button active" data-speed="1" aria-pressed="true" disabled>1.0x</button>
             </div>
         </div>
 
-        <div class="status" id="status"></div>
-    </div>
-
-    <script src="app.js"></script>
+        <div class="status" id="status" role="status"></div>
+    </main>
 </body>
 </html>
