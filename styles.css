@@ -1,3 +1,28 @@
+/* --- 配色 --- */
+:root {
+    --color-bg: #1B3A5C;          /* 背景（藍） */
+    --color-paper: #F5F0E8;       /* プレイヤー本体 */
+    --color-panel: #EDE6DA;       /* 情報・ループ設定パネル */
+    --color-input: #FFFDF8;       /* セレクト・速度ボタン */
+    --color-gold: #C4972F;        /* 枠線・アクセント */
+    --color-gold-dark: #A07828;
+    --color-text: #2A2A2A;
+    --color-text-sub: #4A4A4A;
+    --color-text-muted: #7A6A5A;
+    --color-label: #7A6040;
+    --color-red: #C53D43;         /* 再生ボタン */
+    --color-red-hover: #A8333A;
+    --color-red-active: #8E2B30;
+    --color-green: #3A6B4C;       /* ループボタン */
+    --color-green-hover: #2E5640;
+    --color-green-active: #234330;
+    --color-brown: #8A7060;       /* 解除・閉じるボタン */
+    --color-brown-hover: #705A4C;
+
+    --radius: 4px;
+    --transition: 0.2s ease;
+}
+
 body {
     font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'MS PMincho', serif;
     display: flex;
@@ -5,12 +30,32 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    background: #1B3A5C;
+    background: var(--color-bg);
     touch-action: manipulation;
 }
 
+[hidden] {
+    display: none !important;
+}
+
+button {
+    font-family: inherit;
+    touch-action: manipulation;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* キーボード操作時のみフォーカス枠を表示する（セレクトは独自のフォーカス表示あり） */
+button:focus-visible {
+    outline: 2px solid var(--color-gold-dark);
+    outline-offset: 2px;
+}
+
 .player-container {
-    background: #F5F0E8;
+    background: var(--color-paper);
     padding: 20px;
     border-radius: 6px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
@@ -18,11 +63,206 @@ body {
     max-width: 400px;
     width: 90%;
     position: relative;
-    border: 1px solid #C4972F;
+    border: 1px solid var(--color-gold);
 }
 
+/* --- ヘッダー --- */
+.refresh-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.06);
+    color: #A09080;
+    border: none;
+    border-radius: var(--radius);
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.refresh-button:active {
+    color: var(--color-label);
+}
+
+.app-header {
+    margin-bottom: 12px;
+}
+
+.app-header-sub {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    letter-spacing: 0.15em;
+}
+
+.app-header-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--color-text);
+    margin: 2px 0 0;
+}
+
+.app-header-ruby {
+    font-size: 11px;
+    color: var(--color-label);
+    letter-spacing: 0.1em;
+}
+
+/* --- 音声選択 --- */
+.audio-selector {
+    margin-bottom: 10px;
+}
+
+.audio-selector select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 1px solid var(--color-gold);
+    border-radius: var(--radius);
+    background: var(--color-input);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    outline: none;
+    touch-action: manipulation;
+}
+
+.audio-selector select:hover {
+    border-color: var(--color-gold-dark);
+}
+
+.audio-selector select:focus {
+    border-color: var(--color-gold-dark);
+    box-shadow: 0 0 0 2px rgba(196, 151, 47, 0.2);
+}
+
+/* --- 音声情報 --- */
+.audio-info {
+    background: var(--color-panel);
+    padding: 10px 15px;
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    text-align: left;
+    border-left: 3px solid var(--color-gold);
+    /* 右下の台本アイコンを絶対配置するための基準 */
+    position: relative;
+}
+
+.audio-info h2 {
+    color: var(--color-text);
+    font-size: 17px;
+    font-weight: bold;
+    margin: 0 0 6px 0;
+    border-bottom: 1px solid var(--color-gold);
+    padding-bottom: 6px;
+}
+
+.info-item {
+    margin: 4px 0;
+    color: var(--color-text-sub);
+    font-size: 13px;
+}
+
+.info-label {
+    font-weight: bold;
+    color: var(--color-label);
+    display: inline-block;
+    width: 100px;
+}
+
+/* --- 関連画像（台本）アイコン --- */
+.image-toggle {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    background: var(--color-gold);
+    color: var(--color-input);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color var(--transition);
+    box-shadow: 0 2px 4px rgba(196, 151, 47, 0.4);
+}
+
+.image-toggle svg {
+    width: 18px;
+    height: 18px;
+}
+
+.image-toggle:active {
+    background: var(--color-gold-dark);
+}
+
+/* 参照画像がないときは非アクティブ表示 */
+.image-toggle:disabled {
+    opacity: 1;
+    background: #D8CFBE;
+    color: #B0A690;
+    box-shadow: none;
+}
+
+/* 画像表示中は × ボタン表示 */
+.image-toggle.showing {
+    background: var(--color-brown);
+    box-shadow: 0 2px 4px rgba(138, 112, 96, 0.4);
+}
+
+.image-toggle .icon-close,
+.image-toggle.showing .icon-open {
+    display: none;
+}
+
+.image-toggle.showing .icon-close {
+    display: block;
+}
+
+/* --- 関連画像（台本）インライン表示 --- */
+.image-inline {
+    margin-bottom: 10px;
+    padding: 8px;
+    background: var(--color-panel);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--color-gold);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    text-align: center;
+}
+
+.image-inline-img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto 8px;
+    border: 1px solid var(--color-gold);
+    border-radius: 2px;
+    cursor: zoom-in;
+}
+
+.image-inline-img:last-child {
+    margin-bottom: 0;
+}
+
+/* タップで拡大（横スクロールで全体を確認） */
+.image-inline-img.zoomed {
+    max-width: none;
+    width: 200%;
+    cursor: zoom-out;
+}
+
+/* --- プレイヤー --- */
 .audio-player {
     margin: 10px 0;
+}
+
+audio {
+    width: 100%;
+    margin-top: 8px;
+    outline: none;
 }
 
 .button-container {
@@ -33,158 +273,136 @@ body {
 }
 
 .play-button {
-    background: #C53D43;
-    color: #F5F0E8;
+    background: var(--color-red);
+    color: var(--color-paper);
     border: none;
     padding: 12px 0;
     font-size: 16px;
-    font-family: inherit;
     letter-spacing: 0.1em;
-    border-radius: 4px;
+    border-radius: var(--radius);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color var(--transition), box-shadow var(--transition);
     box-shadow: 0 2px 6px rgba(197, 61, 67, 0.3);
     flex: 1;
     max-width: 150px;
-    touch-action: manipulation;
 }
 
 .play-button:hover {
-    background: #A8333A;
+    background: var(--color-red-hover);
     box-shadow: 0 3px 10px rgba(197, 61, 67, 0.5);
 }
 
 .play-button:active {
-    background: #8E2B30;
+    background: var(--color-red-active);
 }
 
-.play-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+/* --- ループ範囲 --- */
+.loop-controls {
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--color-panel);
+    border-radius: var(--radius);
 }
 
-audio {
-    width: 100%;
+.loop-controls-label {
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--color-label);
+    margin-bottom: 8px;
+}
+
+.loop-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.loop-button {
+    background: var(--color-green);
+    color: var(--color-paper);
+    border: none;
+    padding: 8px 16px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color var(--transition);
+    box-shadow: 0 2px 4px rgba(58, 107, 76, 0.3);
+}
+
+.loop-button:hover {
+    background: var(--color-green-hover);
+}
+
+.loop-button:active {
+    background: var(--color-green-active);
+}
+
+.loop-button.clear-button {
+    background: var(--color-brown);
+    box-shadow: 0 2px 4px rgba(138, 112, 96, 0.3);
+}
+
+.loop-button.clear-button:hover {
+    background: var(--color-brown-hover);
+}
+
+.loop-range-display {
     margin-top: 8px;
-    outline: none;
+    font-size: 14px;
+    color: var(--color-text-sub);
+    min-height: 20px;
 }
 
+/* --- 再生速度 --- */
+.speed-controls {
+    margin-top: 10px;
+}
+
+.speed-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.speed-button {
+    background: var(--color-input);
+    color: var(--color-text-sub);
+    border: 1px solid var(--color-gold);
+    padding: 7px 18px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color var(--transition), color var(--transition);
+}
+
+.speed-button:hover {
+    background: #F0E8D8;
+}
+
+.speed-button:active {
+    background: #E0D8C8;
+}
+
+.speed-button.active {
+    background: var(--color-gold);
+    color: var(--color-input);
+}
+
+/* --- ステータス --- */
 .status {
     margin-top: 8px;
-    color: #7A6A5A;
+    color: var(--color-text-muted);
     font-size: 13px;
     min-height: 20px;
 }
 
-.audio-info {
-    background: #EDE6DA;
-    padding: 10px 15px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    text-align: left;
-    border-left: 3px solid #C4972F;
-    /* 右下の台本アイコンを絶対配置するための基準 */
-    position: relative;
-}
-
-.audio-info h2 {
-    color: #2A2A2A;
-    font-size: 17px;
-    font-weight: bold;
-    margin: 0 0 6px 0;
-    border-bottom: 1px solid #C4972F;
-    padding-bottom: 6px;
-}
-
-.info-item {
-    margin: 4px 0;
-    color: #4A4A4A;
-    font-size: 13px;
-}
-
-.info-label {
-    font-weight: bold;
-    color: #7A6040;
-    display: inline-block;
-    width: 100px;
-}
-
-.refresh-button {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(0, 0, 0, 0.06);
-    color: #A09080;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 10px;
-    font-size: 11px;
-    font-family: inherit;
-    cursor: pointer;
-}
-
-.refresh-button:active {
-    color: #7A6040;
-}
-
-.app-header {
-    margin-bottom: 12px;
-}
-
-.app-header-sub {
-    font-size: 11px;
-    color: #7A6A5A;
-    letter-spacing: 0.15em;
-}
-
-.app-header-title {
-    font-size: 22px;
-    font-weight: bold;
-    color: #2A2A2A;
-    margin-top: 2px;
-}
-
-.app-header-ruby {
-    font-size: 11px;
-    color: #7A6040;
-    letter-spacing: 0.1em;
-}
-
-.audio-selector {
-    margin-bottom: 10px;
-}
-
-.audio-selector select {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 15px;
-    font-family: inherit;
-    border: 1px solid #C4972F;
-    border-radius: 4px;
-    background: #FFFDF8;
-    color: #2A2A2A;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    outline: none;
-    touch-action: manipulation;
-}
-
-.audio-selector select:hover {
-    border-color: #A07828;
-}
-
-.audio-selector select:focus {
-    border-color: #A07828;
-    box-shadow: 0 0 0 2px rgba(196, 151, 47, 0.2);
-}
-
+/* --- 横向き警告 --- */
 .orientation-warning {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background: rgba(0, 0, 0, 0.95);
     color: white;
     justify-content: center;
@@ -209,188 +427,6 @@ audio {
 @keyframes rotate-phone {
     0%, 100% { transform: rotate(0deg); }
     50% { transform: rotate(90deg); }
-}
-
-.loop-controls {
-    margin-top: 10px;
-    padding: 10px;
-    background: #EDE6DA;
-    border-radius: 4px;
-}
-
-.loop-controls-label {
-    font-size: 13px;
-    font-weight: bold;
-    color: #7A6040;
-    margin-bottom: 8px;
-}
-
-.loop-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-}
-
-.loop-button {
-    background: #3A6B4C;
-    color: #F5F0E8;
-    border: none;
-    padding: 8px 16px;
-    font-size: 13px;
-    font-family: inherit;
-    letter-spacing: 0.05em;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(58, 107, 76, 0.3);
-    touch-action: manipulation;
-}
-
-.loop-button:hover {
-    background: #2E5640;
-}
-
-.loop-button:active {
-    background: #234330;
-}
-
-.loop-button.clear-button {
-    background: #8A7060;
-    box-shadow: 0 2px 4px rgba(138, 112, 96, 0.3);
-}
-
-.loop-button.clear-button:hover {
-    background: #705A4C;
-}
-
-.loop-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.loop-range-display {
-    margin-top: 8px;
-    font-size: 14px;
-    color: #4A4A4A;
-    min-height: 20px;
-}
-
-.speed-controls {
-    margin-top: 10px;
-}
-
-.speed-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-}
-
-.speed-button {
-    background: #FFFDF8;
-    color: #4A4A4A;
-    border: 1px solid #C4972F;
-    padding: 7px 18px;
-    font-size: 14px;
-    font-family: inherit;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    touch-action: manipulation;
-}
-
-.speed-button:hover {
-    background: #F0E8D8;
-}
-
-.speed-button:active {
-    background: #E0D8C8;
-}
-
-.speed-button.active {
-    background: #C4972F;
-    color: #FFFDF8;
-    border-color: #C4972F;
-}
-
-.speed-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* --- 関連画像（台本）アイコン --- */
-.image-toggle {
-    position: absolute;
-    right: 8px;
-    bottom: 8px;
-    width: 34px;
-    height: 34px;
-    padding: 0;
-    font-size: 18px;
-    line-height: 1;
-    background: #C4972F;
-    color: #FFFDF8;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(196, 151, 47, 0.4);
-    touch-action: manipulation;
-}
-
-.image-toggle:active {
-    background: #A07828;
-}
-
-/* 参照画像がないときは非アクティブ表示 */
-.image-toggle:disabled {
-    background: #D8CFBE;
-    color: #B0A690;
-    box-shadow: none;
-    cursor: not-allowed;
-}
-
-/* 画像表示中は × ボタン表示 */
-.image-toggle.showing {
-    background: #8A7060;
-    box-shadow: 0 2px 4px rgba(138, 112, 96, 0.4);
-}
-
-/* --- 関連画像（台本）インライン表示 --- */
-.image-inline {
-    margin-bottom: 10px;
-    padding: 8px;
-    background: #EDE6DA;
-    border-radius: 4px;
-    border-left: 3px solid #C4972F;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    text-align: center;
-}
-
-.image-inline[hidden] {
-    display: none;
-}
-
-.image-inline-img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 0 auto 8px;
-    border: 1px solid #C4972F;
-    border-radius: 2px;
-    cursor: zoom-in;
-}
-
-.image-inline-img:last-child {
-    margin-bottom: 0;
-}
-
-/* タップで拡大（横スクロールで全体を確認） */
-.image-inline-img.zoomed {
-    max-width: none;
-    width: 200%;
-    cursor: zoom-out;
 }
 
 @media screen and (orientation: landscape) and (max-height: 500px) {
